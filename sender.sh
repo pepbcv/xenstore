@@ -1,24 +1,14 @@
 #!/bin/bash
 
-# Configurazione
-MY_DOMID=15
-KEY="/local/domain/$MY_DOMID/msg"
-ITER=1000
+KEY="/local/domain/0/messaging/test"
+ITERATIONS=1000
+MESSAGE=$(head -c 1024 < /dev/zero | tr '\0' 'A')
 
-echo "DomuA: scrivo $ITER messaggi da 1024 byte nella chiave $KEY"
+echo "DomU-A: invio di $ITERATIONS messaggi da 1024 byte..."
 
-for i in $(seq 1 $ITER); do
-  # Parte identificativa del messaggio
-  HEAD="msg-$i-$(date +%s%N)"
-  
-  # Calcola quanti padding byte servono per arrivare a 1024
-  PADDING=$(printf "X%.0s" $(seq 1 $((1024 - ${#HEAD}))))
-  
-  # Componi il messaggio finale
-  MSG="${HEAD}${PADDING}"
-
-  # Scrivi su xenstore
-  echo "$MSG" | xenstore-write "$KEY"
+for ((i=1; i<=ITERATIONS; i++)); do
+    xenstore-write "$KEY" "$MESSAGE"
+    sleep 0.001
 done
 
-echo "Scrittura completata."
+echo "DomuA: invio completato."
