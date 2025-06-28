@@ -4,31 +4,34 @@
 KEY="/local/domain/0/messaging/test"
 ITERATIONS=10000
 MSG_SIZE=1024
-SLEEP_MS=1 # pausa tra invii in ms
+SLEEP_MS=1
 
-echo "DomuA: invio di $ITERATIONS messaggi da $MSG_SIZE byte..."
+echo "DomU-B: lettura di $ITERATIONS messaggi..."
 
-# Prepara il messaggio costante
-MESSAGE=$(head -c $MSG_SIZE < /dev/zero | tr '\0' 'A')
-
-# Rimuove eventuali chiavi residue
-xenstore-rm "$KEY" 2>/dev/null
-
-start_ns=$(date +%s%N)
+total_latency_ns=0
+invalid_count=0
 
 for ((i=1; i<=ITERATIONS; i++)); do
-    xenstore-write "$KEY" "$MESSAGE"
+    start_ns=$(date +%s%N)
+    MESSAGE=$(xenstore-read "$KEY")
+    end_ns=$(date +%s%N)
+
+    delta_ns=$((end_ns - start_ns))
+    total_latency_ns=$((total_latency_ns + delta_ns))
+
+    actual_size=$(echo -n "$MESSAGE" | wc -c)
+    if [ "$actual_size" -ne "$MSG_SIZE" ]; then
+        echo "Messaggio $i: dimensione $actual_size byte (anziché $MSG_SIZE)"
+        invalid_count=$((invalid_count + 1))
+    fi
+
     sleep 0.$(printf "%03d" $SLEEP_MS)
 done
 
-end_ns=$(date +%s%N)
-duration_ns=$((end_ns - start_ns))
-total_bytes=$((ITERATIONS * MSG_SIZE))
+# Calcoli finali
+avg_latency_ns=$((total_latency_ns / ITERATIONS))
+avg_latency_ms=$(echo "scale=3; $avg_latency_ns / 1000000" | bc)
 
-# Flusso medio in MB/s
-duration_s=$(echo "scale=6; $duration_ns / 1000000000" | bc)
-throughput=$(echo "scale=2; $total_bytes / duration_s / (1024*1024)" | bc)
-
-echo "Mittente completato:"
-echo "   Durata totale: ${duration_s}s"
-echo "   Throughput medio: ${throughput} MB/s"
+echo "Ricevente completato:"
+echo "   Latenza media: $avg_latency_ns ns (${avg_latency_ms} ms)"
+echo "   Messaggi fuori taglia: $invalid_count/$ITERATIONS"
