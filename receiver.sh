@@ -1,44 +1,38 @@
 #!/bin/bash
 
-# Configurazione
-SENDER_DOMID=15
-KEY="/local/domain/$SENDER_DOMID/msg"
-ITER=1000
-MSG_SIZE=1024  # byte attesi per ogni messaggio
+# CONFIGURAZIONI
+KEY="/local/domain/0/messaging/test"
+ITERATIONS=10000
+MSG_SIZE=1024
+SLEEP_MS=1
 
-echo "📥 DomU-B: leggo $ITER messaggi da $KEY"
+echo "DomU-B: lettura di $ITERATIONS messaggi..."
 
-total_ns=0
+total_latency_ns=0
 invalid_count=0
 
-for i in $(seq 1 $ITER); do
-  t_start=$(date +%s%N)
+for ((i=1; i<=ITERATIONS; i++)); do
+    start_ns=$(date +%s%N)
+    MESSAGE=$(xenstore-read "$KEY")
+    end_ns=$(date +%s%N)
 
-  MSG=$(xenstore-read "$KEY")
+    delta_ns=$((end_ns - start_ns))
+    total_latency_ns=$((total_latency_ns + delta_ns))
 
-  t_end=$(date +%s%N)
-  delta=$((t_end - t_start))
-  total_ns=$((total_ns + delta))
+    actual_size=$(echo -n "$MESSAGE" | wc -c)
+    if [ "$actual_size" -ne "$MSG_SIZE" ]; then
+        echo "⚠️ Messaggio $i: dimensione $actual_size byte (anziché $MSG_SIZE)"
+        invalid_count=$((invalid_count + 1))
+    fi
 
-  # Verifica lunghezza messaggio
-  actual_size=$(echo -n "$MSG" | wc -c)
-  if [ "$actual_size" -ne "$MSG_SIZE" ]; then
-    echo "⚠️  Messaggio $i con dimensione anomala: $actual_size byte"
-    invalid_count=$((invalid_count + 1))
-  fi
+    sleep 0.$(printf "%03d" $SLEEP_MS)
 done
 
-# Calcola statistiche
-avg_ns=$((total_ns / ITER))
-avg_ms=$(echo "scale=3; $avg_ns / 1000000" | bc)
+# Calcoli finali
+avg_latency_ns=$((total_latency_ns / ITERATIONS))
+avg_latency_ms=$(echo "scale=3; $avg_latency_ns / 1000000" | bc)
 
-# Calcolo throughput
-total_bytes=$((ITER * MSG_SIZE))
-total_sec=$(echo "scale=6; $total_ns / 1000000000" | bc)
-throughput=$(echo "scale=2; $total_bytes / $total_sec" | bc)
+echo "Ricevente completato:"
+echo "   Latenza media: $avg_latency_ns ns (${avg_latency_ms} ms)"
+echo "   Messaggi fuori taglia: $invalid_count/$ITERATIONS"
 
-# Risultati finali
-echo "RISULTATI"
-echo "Latenza media: $avg_ns ns (${avg_ms} ms)"
-echo "Throughput: $throughput byte/sec"
-echo "Messaggi fuori misura: $invalid_count"
