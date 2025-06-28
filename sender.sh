@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# 🔧 CONFIGURAZIONI
+# CONFIGURAZIONI
 KEY="/local/domain/0/messaging/test"
 ITERATIONS=10000
 MSG_SIZE=1024
 SLEEP_MS=1 # pausa tra invii in ms
 
-echo "🚀 DomU-A: invio di $ITERATIONS messaggi da $MSG_SIZE byte..."
+echo "DomuA: invio di $ITERATIONS messaggi da $MSG_SIZE byte..."
 
 # Prepara il messaggio costante
 MESSAGE=$(head -c $MSG_SIZE < /dev/zero | tr '\0' 'A')
@@ -29,6 +29,6 @@ total_bytes=$((ITERATIONS * MSG_SIZE))
 duration_s=$(echo "scale=6; $duration_ns / 1000000000" | bc)
 throughput=$(echo "scale=2; $total_bytes / duration_s / (1024*1024)" | bc)
 
-echo "✅ Mittente completato:"
+echo "Mittente completato:"
 echo "   Durata totale: ${duration_s}s"
 echo "   Throughput medio: ${throughput} MB/s"
