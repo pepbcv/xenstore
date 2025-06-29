@@ -5,8 +5,14 @@ DOMUB_ID=6
 
 READY_PATH="/local/domain/$DOMUB_ID/ready"
 PREFIX="/local/domain/$DOMUA_ID/data"
-NUM_MSG=10
+NUM_MSG=100
 MSG_SIZE=1024
+
+# Avvia monitoraggio CPU/memoria
+echo "Stato prima del test:" > mittente_metrics.log
+free -h >> mittente_metrics.log
+top -b -n1 | grep "Cpu(s)" >> mittente_metrics.log
+echo "-------------------------------" >> mittente_metrics.log
 
 # Attende che il ricevente sia pronto
 echo "Attendo ricevente..."
@@ -41,3 +47,10 @@ end_total=$(date +%s.%N)
 durata=$(echo "$end_total - $start_total" | bc)
 echo "Mittente completato."
 echo "Durata totale: ${durata}s"
+
+#Stato dopo il test
+echo "" >> mittente_metrics.log
+echo "🧪 Stato dopo il test:" >> mittente_metrics.log
+free -h >> mittente_metrics.log
+top -b -n1 | grep "Cpu(s)" >> mittente_metrics.log
+echo "Test terminato in ${durata}s" >> mittente_metrics.log
