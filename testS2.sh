@@ -1,7 +1,6 @@
 #!/bin/bash
 
-DOMID=2
-BASE_PATH="/local/domain/${DOMID}/data"
+BASE_PATH="/local/domain/2/data"
 NUM_MSG=10
 
 for i in $(seq 1 $NUM_MSG); do
@@ -12,5 +11,5 @@ for i in $(seq 1 $NUM_MSG); do
 
     echo "Scrivo: $HEADER"
     sudo xenstore-write "${BASE_PATH}/msg_$i" "$MESSAGE"
-    sleep 0.2
+    sleep 1
 done
