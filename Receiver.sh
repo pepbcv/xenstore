@@ -50,7 +50,7 @@ echo "Throughput medio: ${throughput} MB/s"
 
 # Stato finale
 echo "" >> ricevente_metrics.log
-echo "🧪 Stato dopo il test:" >> ricevente_metrics.log
+echo "Stato dopo il test:" >> ricevente_metrics.log
 free -h >> ricevente_metrics.log
 top -b -n1 | grep "Cpu(s)" >> ricevente_metrics.log
 echo "Test terminato in ${durata}s" >> ricevente_metrics.log
