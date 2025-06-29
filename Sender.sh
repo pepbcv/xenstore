@@ -50,7 +50,7 @@ echo "Durata totale: ${durata}s"
 
 #Stato dopo il test
 echo "" >> mittente_metrics.log
-echo "🧪 Stato dopo il test:" >> mittente_metrics.log
+echo "Stato dopo il test:" >> mittente_metrics.log
 free -h >> mittente_metrics.log
 top -b -n1 | grep "Cpu(s)" >> mittente_metrics.log
 echo "Test terminato in ${durata}s" >> mittente_metrics.log
