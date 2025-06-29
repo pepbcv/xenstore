@@ -5,9 +5,16 @@ DOMUB_ID=6
 
 READY_PATH="/local/domain/$DOMUB_ID/ready"
 PREFIX="/local/domain/$DOMUA_ID/data"
-NUM_MSG=10
+NUM_MSG=100
 MSG_SIZE=1024
 total_latency=0
+
+
+#Stato iniziale
+echo "🧪 Stato prima del test:" > ricevente_metrics.log
+free -h >> ricevente_metrics.log
+top -b -n1 | grep "Cpu(s)" >> ricevente_metrics.log
+echo "-------------------------------" >> ricevente_metrics.log
 
 # Segnala che sei pronto
 sudo xenstore-write "$READY_PATH" "ready"
@@ -40,3 +47,10 @@ echo "Ricevitore completato."
 echo "Durata totale: ${durata}s"
 echo "Latenza media: ${media_latency}s"
 echo "Throughput medio: ${throughput} MB/s"
+
+# Stato finale
+echo "" >> ricevente_metrics.log
+echo "🧪 Stato dopo il test:" >> ricevente_metrics.log
+free -h >> ricevente_metrics.log
+top -b -n1 | grep "Cpu(s)" >> ricevente_metrics.log
+echo "Test terminato in ${durata}s" >> ricevente_metrics.log
