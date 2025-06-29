@@ -6,17 +6,9 @@ NUM_MSG=10
 MSG_SIZE=1024
 total_latency=0
 
-# Attende che il ricevente sia pronto
-echo "Attendo ricevente..."
-while true; do
-    READY=$(sudo xenstore-read "$READY_PATH" 2>/dev/null)
-    if [[ "$READY" == "1" ]]; then
-        break
-    fi
-    sleep 0.1
-done
-echo "Ricevente pronto. Inizio invio..."
-
+# Segnala che sei pronto
+sudo xenstore-write "$READY_PATH" 1
+echo "Ricevente pronto."
 
 start_total=$(date +%s.%N)
 
