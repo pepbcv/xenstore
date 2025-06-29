@@ -1,13 +1,19 @@
 #!/bin/bash
 
-READY_PATH="/local/domain/1/ready"
 PREFIX="/local/domain/2/data"
 NUM_MSG=10
 MSG_SIZE=1024
 
-# Segnala che sei pronto
-sudo xenstore-write "$READY_PATH" 1
-echo "Ricevente pronto."
+# Attende che il ricevente sia pronto
+echo "Attendo ricevente..."
+while true; do
+    READY=$(sudo xenstore-read "$READY_PATH" 2>/dev/null)
+    if [[ "$READY" == "1" ]]; then
+        break
+    fi
+    sleep 1
+done
+echo "Ricevente pronto. Inizio invio..."
 
 
 start_total=$(date +%s.%N)
