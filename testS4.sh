@@ -1,18 +1,22 @@
 #!/bin/bash
 
-PREFIX="/local/domain/2/data"
+DOMUA_ID=5
+DOMUB_ID=6
+
+READY_PATH="/local/domain/$DOMUB_ID/ready"
+PREFIX="/local/domain/$DOMUA_ID/data"
 NUM_MSG=10
 MSG_SIZE=1024
 
 # Attende che il ricevente sia pronto
 echo "Attendo ricevente..."
 trovato=0
-while [[ "$trovato" -ne 1 ]]; do
-    val=$(sudo xenstore-read /local/domain/1/ready 2>/dev/null)
-    if [[ "$val" == "1212" ]]; then
+while [[ "$trovato" == 0 ]]; do
+    val=$(sudo xenstore-read /local/domain/$DOMUB_ID/ready 2>/dev/null)
+    if [[ "$val" == "ready" ]]; then
         trovato=1
     else
-        echo "In attesa del segnale '1212' da domuB..."
+        echo "In attesa del segnale 'ready' da domuB..."
         sleep 1
     fi
 done
