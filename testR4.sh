@@ -7,7 +7,7 @@ MSG_SIZE=1024
 total_latency=0
 
 # Segnala che sei pronto
-sudo xenstore-write "$READY_PATH" 1
+sudo xenstore-write "$READY_PATH" 1212
 echo "Ricevente pronto."
 
 start_total=$(date +%s.%N)
