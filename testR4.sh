@@ -1,13 +1,16 @@
 #!/bin/bash
 
-READY_PATH="/local/domain/1/ready"
-PREFIX="/local/domain/2/data"
+DOMUA_ID=5
+DOMUB_ID=6
+
+READY_PATH="/local/domain/$DOMUB_ID/ready"
+PREFIX="/local/domain/$DOMUA_ID/data"
 NUM_MSG=10
 MSG_SIZE=1024
 total_latency=0
 
 # Segnala che sei pronto
-sudo xenstore-write "$READY_PATH" 1212
+sudo xenstore-write "$READY_PATH" "ready"
 echo "Ricevente pronto."
 
 start_total=$(date +%s.%N)
