@@ -1,7 +1,6 @@
 #!/bin/bash
 
-DOMID_B=2
-PREFIX="/local/domain/${DOMID_B}/data"
+PREFIX="/local/domain/2/data"
 NUM_MSG=10
 MSG_SIZE=1024
 
