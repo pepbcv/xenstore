@@ -6,13 +6,17 @@ MSG_SIZE=1024
 
 # Attende che il ricevente sia pronto
 echo "Attendo ricevente..."
-while true; do
-    READY=$(sudo xenstore-read "$READY_PATH" 2>/dev/null)
-    if [[ "$READY" == "1" ]]; then
-        break
+trovato=0
+while [[ "$trovato" -ne 1 ]]; do
+    val=$(sudo xenstore-read /local/domain/1/ready 2>/dev/null)
+    if [[ "$val" == "1212" ]]; then
+        trovato=1
+    else
+        echo "In attesa del segnale '1212' da domuB..."
+        sleep 1
     fi
-    sleep 1
 done
+
 echo "Ricevente pronto. Inizio invio..."
 
 
